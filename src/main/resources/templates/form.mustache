@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>Sanctions</h1>
+<script>
+    $(function () {
+        var form = $('#sanctionForm');
+        form.submit(function(e){
+            e.preventDefault();
+            var name = $.trim($("#name").val())
+
+            console.log( $( this ).serialize() );
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: {name: name},
+                success: function (response) {
+
+                    var div = $('#sanctionDiv')
+                    if(response.length === 0) {
+                        div.html('');
+                        return
+                    }
+
+                    var trHTML = '<table>';
+                    trHTML += '<tr><th>Entity Id</th><th>Alias</th><th>Relevance</th><th>Sanctioned</th></tr>'
+
+                    response.forEach(function (entity){
+                        
+                        entity.aliases.forEach(function (alias) {
+                            trHTML += '<tr><td>' + entity.entityId+ '</td><td>' + alias + '</td>' +
+                                    '<td>' + entity.relevance + '</td><td>'+ entity.sanctioned +'</td></tr>';
+                        });
+                    });
+                    trHTML += '</table>';
+
+                    div.html(trHTML);
+                }
+            });
+
+        });
+    });
+</script>
+
+<form id="sanctionForm" action="/search" method="get">
+    <label for="name">Query:</label>
+    <input type="text" id="name" name="name"/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<div id="sanctionDiv" />
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+version: '3.4'
+
+
+services:
+  # Uncomment any data store you need, or add your own
+
+  mongo:
+    image: mongo
+    ports:
+    - 27017:27017
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80:8080
+    # Uncomment links
+    links:
+      - mongo
+    #volumes:
+    #  - ./stubs:/stubs
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    links:
+      - api
+    environment:
+      - API=api:8080
+    command:
+      - ./smoke-test.sh
